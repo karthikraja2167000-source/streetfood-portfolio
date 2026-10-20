@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StreetBite — Street Food</title>
+  <style>
+    :root {
+      --bg: #f7f5f0;
+      --card: #fff;
+      --ink: #20221f;
+      --muted: #777970;
+      --accent: #f06432;
+      --accent-dark: #d94c1d;
+      --green: #2d6a4f;
+      --line: #e9e6df;
+      --shadow: 0 12px 35px rgba(45, 40, 32, .08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .topbar {
+      height: 74px;
+      padding: 0 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 21px; }
+    .brand-mark {
+      width: 38px; height: 38px; border-radius: 12px;
+      display: grid; place-items: center; background: var(--accent); color: white;
+    }
+    .brand span { color: var(--accent); }
+    .top-note { color: var(--muted); font-size: 13px; }
+    main { width: min(1180px, 90%); margin: 36px auto 70px; }
+    .hero {
+      padding: 42px;
+      min-height: 240px;
+      border-radius: 24px;
+      color: white;
+      background:
+        linear-gradient(100deg, rgba(24,31,26,.9), rgba(24,31,26,.35)),
+        url("https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1600&q=85") center/cover;
+      display: flex;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .hero-copy { max-width: 580px; }
+    .eyebrow { color: #ffd0b8; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; font-weight: 800; }
+    h1 { margin: 10px 0; font-size: clamp(34px, 5vw, 54px); line-height: 1.05; }
+    .hero p { max-width: 470px; color: #f1eee9; line-height: 1.6; }
+    .section-head {
+      display: flex; align-items: end; justify-content: space-between; gap: 15px;
+      margin: 38px 0 18px;
+    }
+    h2 { margin: 0; font-size: 25px; }
+    .section-head p { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+    .search, .filter {
+      border: 1px solid var(--line); border-radius: 12px; background: white; padding: 11px 13px;
+      outline: none;
+    }
+    .search:focus, .filter:focus, input:focus, select:focus { border-color: var(--accent); }
+    .btn {
+      border: 0; border-radius: 11px; padding: 11px 16px; font-weight: 750;
+      background: var(--accent); color: white; transition: .18s ease;
+    }
+    .btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    .btn.secondary { background: #f2eee7; color: var(--ink); }
+    .btn.secondary:hover { background: #e8e2d8; }
+    .btn.danger { background: #ffe7e1; color: #a5351a; }
+    .products {
+      display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px;
+    }
+    .product {
+      overflow: hidden; border-radius: 17px; background: var(--card);
+      border: 1px solid var(--line); box-shadow: 0 6px 20px rgba(45,40,32,.04);
+    }
+    .product img { width: 100%; height: 185px; object-fit: cover; display: block; background: #eee; }
+    .product-body { padding: 16px; }
+    .product-top { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+    .product h3 { margin: 0; font-size: 17px; }
+    .tag { color: var(--green); background: #e9f3ed; padding: 5px 9px; border-radius: 20px; font-size: 11px; font-weight: 750; }
+    .description { margin: 9px 0 14px; color: var(--muted); font-size: 13px; line-height: 1.5; min-height: 38px; }
+    .product-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .price { font-size: 19px; font-weight: 850; }
+    .actions { display: flex; gap: 7px; }
+    .small-btn { border: 0; border-radius: 9px; padding: 8px 10px; font-size: 12px; font-weight: 750; }
+    .add-btn { background: var(--accent); color: white; }
+    .edit-btn { background: #f2eee7; color: #444; }
+    .delete-btn { background: #fff0ec; color: #a5351a; }
+    .billing {
+      margin-top: 38px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px;
+    }
+    .panel { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 22px; box-shadow: 0 6px 20px rgba(45,40,32,.04); }
+    .panel h2 { font-size: 20px; margin-bottom: 5px; }
+    .panel-sub { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+    .cart-row {
+      display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 12px;
+      padding: 13px 0; border-bottom: 1px solid var(--line);
+    }
+    .cart-name { font-weight: 750; font-size: 14px; }
+    .cart-price { color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .quantity { display: flex; align-items: center; gap: 8px; }
+    .quantity button { width: 27px; height: 27px; border: 1px solid var(--line); background: white; border-radius: 8px; }
+    .remove { border: 0; background: transparent; color: #a5351a; font-size: 18px; }
+    .empty { padding: 24px 5px; color: var(--muted); text-align: center; font-size: 14px; }
+    .bill-line { display: flex; justify-content: space-between; padding: 8px 0; color: var(--muted); font-size: 14px; }
+    .bill-total { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 14px; color: var(--ink); font-size: 19px; font-weight: 850; }
+    .bill-actions { display: flex; gap: 9px; margin-top: 18px; }
+    .bill-actions button { flex: 1; }
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 10; background: rgba(20,22,19,.55);
+      display: none; align-items: center; justify-content: center; padding: 18px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: min(500px,100%); background: white; border-radius: 19px; padding: 24px; box-shadow: var(--shadow); }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 17px; }
+    .modal-head h2 { font-size: 21px; }
+    .close { border: 0; background: #f2eee7; width: 34px; height: 34px; border-radius: 10px; font-size: 20px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 12px; font-weight: 750; }
+    .field input, .field select { border: 1px solid var(--line); padding: 11px; border-radius: 10px; outline: none; }
+    .modal-submit { width: 100%; margin-top: 16px; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #20221f; color: white; border-radius: 10px; padding: 11px 16px; display: none; z-index: 20; font-size: 14px; }
+    .toast.show { display: block; }
+    footer { padding: 22px; text-align: center; color: var(--muted); font-size: 12px; }
+    @media (max-width: 800px) {
+      .products { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .billing { grid-template-columns: 1fr; }
+      .section-head { align-items: start; flex-direction: column; }
+    }
+    @media (max-width: 540px) {
+      main { width: 92%; margin-top: 20px; }
+      .topbar { padding: 0 4%; }
+      .top-note { display: none; }
+      .hero { padding: 27px; min-height: 220px; }
+      .products { grid-template-columns: 1fr; }
+      .product img { height: 210px; }
+      .toolbar { width: 100%; }
+      .search { flex: 1; min-width: 150px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #billPanel, #billPanel * { visibility: visible; }
+      #billPanel { position: absolute; left: 0; top: 0; width: 100%; border: 0; box-shadow: none; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">🍜</div>Street<span>Bite</span></div>
+    <div class="top-note">Fresh, fast & made with love</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Good food. Good mood.</div>
+        <h1>Big street-food<br>flavors, made fresh.</h1>
+        <p>Explore the menu, add items to the bill, and serve up something delicious.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Our menu</h2>
+          <p>Manage products or add them to the current bill.</p>
+        </div>
+        <div class="toolbar">
+          <input class="search" id="searchInput" type="search" placeholder="Search menu..." />
+          <select class="filter" id="categoryFilter">
+            <option value="All">All categories</option>
+            <option value="Snacks">Snacks</option>
+            <option value="Meals">Meals</option>
+            <option value="Drinks">Drinks</option>
+            <option value="Desserts">Desserts</option>
+          </select>
+          <button class="btn" id="addProductBtn">＋ Add product</button>
+        </div>
+      </div>
+      <div class="products" id="productsGrid"></div>
+    </section>
+
+    <section class="billing">
+      <div class="panel">
+        <h2>Current order</h2>
+        <p class="panel-sub">Adjust quantities or remove items before checkout.</p>
+        <div id="cartItems"></div>
+      </div>
+      <div class="panel" id="billPanel">
+        <h2>Bill summary</h2>
+        <p class="panel-sub">StreetBite · <span id="billDate"></span></p>
+        <div class="bill-line"><span>Subtotal</span><strong id="subtotal">₹0.00</strong></div>
+        <div class="bill-line"><span>Tax (5%)</span><strong id="tax">₹0.00</strong></div>
+        <div class="bill-line bill-total"><span>Total</span><span id="total">₹0.00</span></div>
+        <div class="bill-actions no-print">
+          <button class="btn secondary" id="clearCartBtn">Clear bill</button>
+          <button class="btn" id="printBtn">Print bill</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>StreetBite · A simple menu and billing starter app</footer>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="modalTitle">Add a product</h2>
+        <button class="close" id="closeModal" aria-label="Close">×</button>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="productId" />
+        <div class="form-grid">
+          <div class="field full">
+            <label for="name">Product name</label>
+            <input id="name" required maxlength="50" placeholder="e.g. Spicy chicken roll" />
+          </div>
+          <div class="field">
+            <label for="price">Price (₹)</label>
+            <input id="price" type="number" min="0.01" step="0.01" required placeholder="120" />
+          </div>
+          <div class="field">
+            <label for="category">Category</label>
+            <select id="category" required>
+              <option>Snacks</option><option>Meals</option><option>Drinks</option><option>Desserts</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="image">Image URL (optional)</label>
+            <input id="image" type="url" placeholder="https://example.com/image.jpg" />
+          </div>
+          <div class="field full">
+            <label for="description">Description</label>
+            <input id="description" maxlength="100" placeholder="A short, tasty description" />
+          </div>
+        </div>
+        <button class="btn modal-submit" type="submit">Save product</button>
+      </form>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const defaultProducts = [
+      { id: 1, name: "Crispy Samosa", price: 40, category: "Snacks", description: "Golden pastry stuffed with spiced potatoes.", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=80" },
+      { id: 2, name: "Street Masala Burger", price: 120, category: "Meals", description: "Loaded with a crunchy patty and house sauce.", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80" },
+      { id: 3, name: "Pani Puri", price: 60, category: "Snacks", description: "Crisp puris with tangy, refreshing pani.", image: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=900&q=80" },
+      { id: 4, name: "Masala Chai", price: 30, category: "Drinks", description: "A warm cup of tea with fragrant spices.", image: "https://images.unsplash.com/photo-1571934811356-5cc061b6821f?auto=format&fit=crop&w=900&q=80" },
+      { id: 5, name: "Loaded Fries", price: 100, category: "Snacks", description: "Crispy fries topped with our signature seasoning.", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80" },
+      { id: 6, name: "Gulab Jamun", price: 50, category: "Desserts", description: "Soft, syrup-soaked bites, served warm.", image: "https://images.unsplash.com/photo-1666190092159-3e2d5d889e63?auto=format&fit=crop&w=900&q=80" }
+    ];
+
+    const fallbackImage = "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80";
+    let products = JSON.parse(localStorage.getItem("streetbite_products")) || defaultProducts;
+    let cart = JSON.parse(localStorage.getItem("streetbite_cart")) || [];
+
+    const $ = (id) => document.getElementById(id);
+    const money = (amount) => "₹" + Number(amount).toFixed(2);
+    const save = () => {
+      localStorage.setItem("streetbite_products", JSON.stringify(products));
+      localStorage.setItem("streetbite_cart", JSON.stringify(cart));
+    };
+
+    function renderProducts() {
+      const query = $("searchInput").value.trim().toLowerCase();
+      const category = $("categoryFilter").value;
+      const shown = products.filter(p =>
+        (category === "All" || p.category === category) &&
+        (p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query))
+      );
+
+      $("productsGrid").innerHTML = shown.length ? shown.map(p => `
+        <article class="product">
+          <img src="${escapeHtml(p.image || fallbackImage)}" alt="${escapeHtml(p.name)}"
+               onerror="this.src='${fallbackImage}'">
+          <div class="product-body">
+            <div class="product-top">
+              <h3>${escapeHtml(p.name)}</h3><span class="tag">${escapeHtml(p.category)}</span>
+            </div>
+            <p class="description">${escapeHtml(p.description || "Freshly prepared and ready to enjoy.")}</p>
+            <div class="product-bottom">
+              <span class="price">${money(p.price)}</span>
+              <div class="actions">
+                <button class="small-btn edit-btn" onclick="editProduct(${p.id})">Edit</button>
+                <button class="small-btn delete-btn" onclick="deleteProduct(${p.id})">Delete</button>
+                <button class="small-btn add-btn" onclick="addToCart(${p.id})">Add</button>
+              </div>
+            </div>
+          </div>
+        </article>`).join("") : `<div class="empty">No menu items found. Try another search or add a product.</div>`;
+    }
+
+    function renderCart() {
+      $("cartItems").innerHTML = cart.length ? cart.map(item => `
+        <div class="cart-row">
+          <div><div class="cart-name">${escapeHtml(item.name)}</div><div class="cart-price">${money(item.price)} each</div></div>
+          <div class="quantity">
+            <button onclick="changeQty(${item.id}, -1)" aria-label="Decrease">−</button>
+            <strong>${item.qty}</strong>
+            <button onclick="changeQty(${item.id}, 1)" aria-label="Increase">+</button>
+          </div>
+          <button class="remove" onclick="removeFromCart(${item.id})" aria-label="Remove item">×</button>
+        </div>`).join("") : `<div class="empty">Your order is empty. Add something tasty from the menu.</div>`;
+
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const tax = subtotal * 0.05;
+      $("subtotal").textContent = money(subtotal);
+      $("tax").textContent = money(tax);
+      $("total").textContent = money(subtotal + tax);
+      $("billDate").textContent = new Date().toLocaleDateString();
+      save();
+    }
+
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+      const item = cart.find(row => row.id === id);
+      if (item) item.qty++;
+      else cart.push({ id: product.id, name: product.name, price: Number(product.price), qty: 1 });
+      renderCart(); notify(product.name + " added to bill");
+    }
+    function changeQty(id, amount) {
+      const item = cart.find(row => row.id === id);
+      if (!item) return;
+      item.qty += amount;
+      if (item.qty <= 0) cart = cart.filter(row => row.id !== id);
+      renderCart();
+    }
+    function removeFromCart(id) { cart = cart.filter(row => row.id !== id); renderCart(); }
+    function deleteProduct(id) {
+      const product = products.find(p => p.id === id);
+      if (!product || !confirm(`Delete "${product.name}" from the menu?`)) return;
+      products = products.filter(p => p.id !== id);
+      renderProducts(); notify("Product deleted");
+    }
+    function editProduct(id) {
+      const p = products.find(item => item.id === id);
+      if (!p) return;
+      $("modalTitle").textContent = "Edit product";
+      $("productId").value = p.id;
+      $("name").value = p.name;
+      $("price").value = p.price;
+      $("category").value = p.category;
+      $("image").value = p.image || "";
+      $("description").value = p.description || "";
+      $("modalBackdrop").classList.add("open");
+    }
+    function openAddModal() {
+      $("productForm").reset();
+      $("productId").value = "";
+      $("modalTitle").textContent = "Add a product";
+      $("modalBackdrop").classList.add("open");
+    }
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[char]));
+    }
+    let toastTimer;
+    function notify(message) {
+      $("toast").textContent = message;
+      $("toast").classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => $("toast").classList.remove("show"), 2200);
+    }
+
+    $("productForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const id = $("productId").value;
+      const data = {
+        name: $("name").value.trim(),
+        price: Number($("price").value),
+        category: $("category").value,
+        image: $("image").value.trim() || fallbackImage,
+        description: $("description").value.trim()
+      };
+      if (!data.name || !Number.isFinite(data.price) || data.price <= 0) return;
+      if (id) {
+        const index = products.findIndex(p => p.id === Number(id));
+        if (index !== -1) products[index] = { ...products[index], ...data };
+        notify("Product updated");
+      } else {
+        products.unshift({ id: Date.now(), ...data });
+        notify("Product added");
+      }
+      save(); renderProducts(); $("modalBackdrop").classList.remove("open");
+    });
+
+    $("addProductBtn").addEventListener("click", openAddModal);
+    $("closeModal").addEventListener("click", () => $("modalBackdrop").classList.remove("open"));
+    $("modalBackdrop").addEventListener("click", event => {
+      if (event.target === $("modalBackdrop")) $("modalBackdrop").classList.remove("open");
+    });
+    $("searchInput").addEventListener("input", renderProducts);
+    $("categoryFilter").addEventListener("change", renderProducts);
+    $("clearCartBtn").addEventListener("click", () => {
+      if (cart.length && confirm("Clear the current bill?")) { cart = []; renderCart(); notify("Bill cleared"); }
+    });
+    $("printBtn").addEventListener("click", () => {
+      if (!cart.length) return notify("Add an item before printing");
+      window.print();
+    });
+
+    renderProducts();
+    renderCart();
+  </script>
+</body>
+</html>
